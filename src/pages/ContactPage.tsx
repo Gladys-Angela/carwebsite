@@ -1,21 +1,38 @@
 import Navigation from "@/components/Navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 
 const ContactPage = () => {
   return (
-    <div>
+    <div className="bg-gray-50">
       <Navigation />
-      <div className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold">Contact Us</h1>
-        <p className="mt-4">
-          We'd love to hear from you! Whether you have a question about our vehicles, pricing, or anything else, our team is ready to answer all your questions.
-        </p>
-        <div className="mt-8">
-          <h2 className="text-2xl font-semibold">Get in Touch</h2>
-          <ul className="mt-4 space-y-2">
-            <li><strong>Email:</strong> contact@driveelite.com</li>
-            <li><strong>Phone:</strong> (555) 123-4567</li>
-            <li><strong>Address:</strong> 123 Auto Street, City, State</li>
-          </ul>
+      <div className="container mx-auto py-16 px-4">
+        <div className="max-w-4xl mx-auto text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900">Get in Touch</h1>
+          <p className="mt-4 text-lg text-gray-600">
+            We'd love to hear from you. Send us a message and we'll get back to you as soon as possible.
+          </p>
+        </div>
+        <div className="mt-16 max-w-2xl mx-auto">
+          <form className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input id="name" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" required />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="message">Message</Label>
+              <Textarea id="message" required rows={6} />
+            </div>
+            <Button type="submit" className="w-full py-6 text-lg">Send Message</Button>
+          </form>
         </div>
       </div>
     </div>

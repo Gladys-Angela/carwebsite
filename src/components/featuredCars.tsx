@@ -1,8 +1,8 @@
-import { Star, MapPin, Calendar, Fuel, Settings, Heart, Phone } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Star, MapPin, Calendar, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useEffect, useState } from "react";
 import api from "@/api";
 
 const FeaturedCars = () => {
@@ -37,82 +37,48 @@ const FeaturedCars = () => {
           Discover our handpicked selection of premium vehicles from trusted dealers
         </p>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
         {featuredCars.map((car) => (
-          <Card key={car.id} className="group hover:shadow-lg transition-shadow duration-300">
+          <Card key={car.id} className="group overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300">
             <CardHeader className="p-0">
               <div className="relative">
                 <img
                   src={car.image}
                   alt={`${car.year} ${car.make} ${car.model}`}
-                  className="w-full h-48 object-cover rounded-t-lg"
+                  className="w-full h-56 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
-                <Badge className="absolute top-2 left-2 bg-primary">
+                <Badge className="absolute top-4 left-4 bg-primary text-primary-foreground">
                   {car.condition}
                 </Badge>
               </div>
             </CardHeader>
-            
-            <CardContent className="p-4">
+            <CardContent className="p-4 bg-card">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="font-semibold text-lg">
-                  {car.year} {car.make} {car.model}
+                <h3 className="font-bold text-xl">
+                  {car.make} {car.model}
                 </h3>
-                <div className="flex items-center gap-1">
-                  <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                  <span className="text-sm">{car.averageRating}</span>
+                <div className="flex items-center gap-1 text-yellow-500">
+                  <Star className="h-5 w-5" />
+                  <span className="text-sm font-semibold">{car.averageRating}</span>
                 </div>
               </div>
-              
-              <p className="text-2xl font-bold text-primary mb-3">
+              <p className="text-lg font-semibold text-primary mb-3">
                 ${car.price.toLocaleString()}
               </p>
-              
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  {car.location}
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="text-sm text-muted-foreground space-y-2 mb-4">
+                <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
-                  {car.mileage.toLocaleString()} miles
+                  <span>{car.year}</span>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Settings className="h-4 w-4" />
-                    {car.transmission}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Fuel className="h-4 w-4" />
-                    {car.fuelType}
-                  </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  <span>{car.location}</span>
                 </div>
               </div>
-              
-              <div className="flex flex-wrap gap-1 mb-4">
-                {car.features.split(',').slice(0, 2).map((feature, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
-                    {feature.trim()}
-                  </Badge>
-                ))}
-                {car.features.split(',').length > 2 && (
-                  <Badge variant="secondary" className="text-xs">
-                    +{car.features.split(',').length - 2} more
-                  </Badge>
-                )}
-              </div>
-              
-              <div className="flex gap-2">
+              <div className="flex gap-2 mt-4">
                 {car.type === 'Sale' ? (
                   <Button className="flex-1" size="sm" onClick={() => handleAddToCart(car.id, 'Sale')}>
+                    <ShoppingCart className="h-4 w-4 mr-2" />
                     Add to Cart
                   </Button>
                 ) : (
@@ -120,23 +86,10 @@ const FeaturedCars = () => {
                     Hire Now
                   </Button>
                 )}
-                <Button variant="outline" size="sm">
-                  <Phone className="h-4 w-4" />
-                </Button>
               </div>
-              
-              <p className="text-xs text-muted-foreground mt-2">
-                Listed by {car.dealer.name}
-              </p>
             </CardContent>
           </Card>
         ))}
-      </div>
-      
-      <div className="text-center mt-12">
-        <Button size="lg" variant="outline">
-          View All Cars
-        </Button>
       </div>
     </section>
   );
