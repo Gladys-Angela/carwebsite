@@ -223,7 +223,7 @@ const Index = () => {
               <div className="space-y-2 text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Phone className="h-4 w-4" />
-                  <span>(555) 123-4567</span>
+                  <span>(254) 756974567</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Mail className="h-4 w-4" />
@@ -231,7 +231,7 @@ const Index = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  <span>123 Auto Street, City, State</span>
+                  <span>Nairobi,Kenya</span>
                 </div>
               </div>
             </div>
