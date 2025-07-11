@@ -21,7 +21,7 @@ SQLite - A simple, file-based database used for local development.
 JSON Web Tokens (JWT) - For creating secure authentication tokens for user sessions. 
 
 ## Frontend Deployment
-Fly.io: https://carwebsite.fly.dev 
+netlify: https://caryard.netlify.app/ 
 ## Backend Deployment (Render)
 For the backend, we will be using a service like Render. It is very user-friendly and has a good free tier for hosting Node.js servers and databases.
 
