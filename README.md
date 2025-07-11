@@ -19,18 +19,10 @@ TypeScript - For consistency with the frontend and for writing type-safe backend
 Prisma - A modern database toolkit (ORM) that makes it easy to interact with the database. 
 SQLite - A simple, file-based database used for local development. 
 JSON Web Tokens (JWT) - For creating secure authentication tokens for user sessions. 
-## Where Login Details Are Saved
-This is an excellent and important question about security and data management.
-•	User Data Storage: All user information, including their username, email, and hashed password, is stored in your SQLite database. The database is a single file located at: server/prisma/dev.db
-•	How to View the Data: The easiest way to view and manage the data in your database is with Prisma Studio, a visual editor for your database. 
-•	To use it:
-1.	Open a terminal in your project.
-2.	Navigate to the server directory: cd server
-3.	Run the command: npx prisma studio
-4.	This will open a new tab in your browser where you can see all your tables (models) and the data inside them, including your users
+
 ## Frontend Deployment
 Fly.io: https://carwebsite.fly.dev 
 ## Backend Deployment (Render)
 For the backend, we will be using a service like Render. It is very user-friendly and has a good free tier for hosting Node.js servers and databases.
 
-Important Note on the Database: Our current SQLite database is a single file, which is not suitable for most production hosting environments. For deployment, we will switch to a more robust database like PostgreSQL. Render offers free, managed PostgreSQL databases that are easy to set up.
+
