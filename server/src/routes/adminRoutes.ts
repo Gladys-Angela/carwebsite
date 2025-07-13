@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { protect, authorize } from '../middleware/authMiddleware';
 import { getAllCars, createCar, updateCar, deleteCar } from '../controllers/carController';
-import { getAllOrders, getOrderById } from '../controllers/orderController';
+import { getAllOrders, getOrderById, createTestOrder } from '../controllers/orderController';
 import { getAllUsers, getUserById, updateUser, deleteUser } from '../controllers/userController';
 
 const router = Router();
@@ -12,6 +12,7 @@ router.route('/cars/:id').put(protect, authorize('admin'), updateCar).delete(pro
 
 // Order routes
 router.route('/orders').get(protect, authorize('admin'), getAllOrders);
+router.route('/orders/test').post(protect, authorize('admin'), createTestOrder);
 router.route('/orders/:id').get(protect, authorize('admin'), getOrderById);
 
 // User routes

@@ -37,9 +37,18 @@ const CarSchema = new mongoose.Schema({
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 });
 
+const OrderSchema = new mongoose.Schema({
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    cars: [{ type: mongoose.Schema.Types.ObjectId, ref: "Car", required: true }],
+    totalPrice: { type: Number, required: true },
+    status: { type: String, enum: ['Pending', 'Completed', 'Cancelled'], default: 'Pending' },
+    createdAt: { type: Date, default: Date.now },
+});
+
 const Dealer = mongoose.model("Dealer", DealerSchema);
 const User = mongoose.model("User", UserSchema);
 const Car = mongoose.model("Car", CarSchema);
+const Order = mongoose.model("Order", OrderSchema);
 
 async function seedDatabase() {
     try {
@@ -184,7 +193,36 @@ async function seedDatabase() {
     },
     ];
 
-    await Car.insertMany(cars);
+    const createdCars = await Car.insertMany(cars);
+    console.log("Cars created!");
+
+    // Create some sample orders
+    const sampleOrders = [
+        {
+            user: user1._id,
+            cars: [createdCars[0]._id, createdCars[1]._id], // Toyota Camry and BMW X5
+            totalPrice: 93500, // 28500 + 65000
+            status: 'Completed',
+            createdAt: new Date('2024-01-15'),
+        },
+        {
+            user: user1._id,
+            cars: [createdCars[2]._id], // Tesla Model 3
+            totalPrice: 42000,
+            status: 'Pending',
+            createdAt: new Date('2024-01-20'),
+        },
+        {
+            user: user1._id,
+            cars: [createdCars[4]._id], // Ford Mustang
+            totalPrice: 45000,
+            status: 'Completed',
+            createdAt: new Date('2024-01-25'),
+        }
+    ];
+
+    await Order.insertMany(sampleOrders);
+    console.log("Sample orders created!");
     console.log("Database seeded successfully!");
 } catch (error) {
     console.error("Seeding error:", error);

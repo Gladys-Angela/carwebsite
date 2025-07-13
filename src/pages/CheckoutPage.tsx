@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -15,19 +15,51 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  useEffect(() => {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to proceed with checkout.",
+        variant: "destructive",
+      });
+      navigate('/login');
+    }
+  }, [navigate, toast]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simple success message without actual payment processing
-    toast({
-      title: "Order placed successfully!",
-      description: "Thank you for your purchase! Your order has been received and will be processed shortly.",
-    });
-    
-    // Navigate to a success page or back to home
-    setTimeout(() => {
-      navigate('/');
-    }, 2000);
+    try {
+      // Create the order in the database
+      const response = await api.post('/orders', {
+        shippingInfo: {
+          name,
+          email,
+          address
+        }
+      });
+      
+      if (response.data) {
+        toast({
+          title: "Order placed successfully!",
+          description: "Thank you for your purchase! Your order has been received and will be processed shortly.",
+        });
+        
+        // Navigate to order confirmation page with order ID
+        setTimeout(() => {
+          navigate(`/confirmation/${response.data._id}`);
+        }, 2000);
+      }
+    } catch (error: any) {
+      console.error('Order creation failed:', error);
+      toast({
+        title: "Order failed",
+        description: error.response?.data?.message || "There was an error processing your order. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

@@ -30,3 +30,12 @@ export const getOrderById = async (req: AuthRequest, res: Response) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+export const createTestOrder = async (req: AuthRequest, res: Response) => {
+  try {
+    const order = await orderService.createTestOrder();
+    res.status(201).json({ message: 'Test order created successfully', order });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
