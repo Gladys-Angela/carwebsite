@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// Updated API configuration for production deployment
 const api = axios.create({
   baseURL: 'https://carwebsite-1-fnsd.onrender.com/api',
 });
