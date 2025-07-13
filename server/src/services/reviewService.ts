@@ -1,62 +1,63 @@
-import prisma from '../config/db';
+import Review from '../models/review.model';
+import Car from '../models/car.model';
 
-export const createReview = async (carId: number, userId: number, data: any) => {
+export const createReview = async (carId: string, userId: string, data: any) => {
   const { rating, comment } = data;
-  const review = await prisma.review.create({
-    data: {
-      rating,
-      comment,
-      car: { connect: { id: carId } },
-      user: { connect: { id: userId } },
-    },
+  const review = new Review({
+    rating,
+    comment,
+    car: carId,
+    user: userId,
   });
+  await review.save();
 
   // Update car's average rating
-  const carReviews = await prisma.review.findMany({ where: { carId } });
-  const averageRating = carReviews.reduce((acc, review) => acc + review.rating, 0) / carReviews.length;
-  await prisma.car.update({
-    where: { id: carId },
-    data: { averageRating },
-  });
+  const car = await Car.findById(carId);
+  if (car) {
+    const reviews = await Review.find({ car: carId });
+    const averageRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+    car.averageRating = averageRating;
+    await car.save();
+  }
 
   return review;
 };
 
-export const getReviewsByCar = async (carId: number) => {
-  return await prisma.review.findMany({
-    where: { carId },
-    include: { user: true },
-  });
+export const getReviewsByCar = async (carId: string) => {
+  return await Review.find({ car: carId }).populate('user');
 };
 
-export const updateReview = async (id: number, data: any) => {
+export const updateReview = async (id: string, data: any) => {
   const { rating, comment } = data;
-  const review = await prisma.review.update({
-    where: { id },
-    data: { rating, comment },
-  });
+  const review = await Review.findByIdAndUpdate(id, { rating, comment }, { new: true });
 
   // Update car's average rating
-  const carReviews = await prisma.review.findMany({ where: { carId: review.carId } });
-  const averageRating = carReviews.reduce((acc, review) => acc + review.rating, 0) / carReviews.length;
-  await prisma.car.update({
-    where: { id: review.carId },
-    data: { averageRating },
-  });
+  if (review) {
+    const car = await Car.findById(review.car);
+    if (car) {
+      const reviews = await Review.find({ car: review.car });
+      const averageRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+      car.averageRating = averageRating;
+      await car.save();
+    }
+  }
 
   return review;
 };
 
-export const deleteReview = async (id: number) => {
-  const review = await prisma.review.delete({ where: { id } });
+export const deleteReview = async (id: string) => {
+  const review = await Review.findByIdAndDelete(id);
 
   // Update car's average rating
-  const carReviews = await prisma.review.findMany({ where: { carId: review.carId } });
-  const averageRating = carReviews.length > 0 ? carReviews.reduce((acc, review) => acc + review.rating, 0) / carReviews.length : 0;
-  await prisma.car.update({
-    where: { id: review.carId },
-    data: { averageRating },
-  });
+  if (review) {
+    const car = await Car.findById(review.car);
+    if (car) {
+      const reviews = await Review.find({ car: review.car });
+      const averageRating = reviews.length > 0 ? reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length : 0;
+      car.averageRating = averageRating;
+      await car.save();
+    }
+  }
 
   return review;
 };

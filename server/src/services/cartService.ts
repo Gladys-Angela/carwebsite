@@ -1,52 +1,56 @@
-import prisma from '../config/db';
+import mongoose from 'mongoose';
+import Cart from '../models/cart.model';
 
-export const getCart = async (userId: number) => {
-  let cart = await prisma.cart.findUnique({
-    where: { userId },
-    include: { items: { include: { car: true } } },
-  });
+export const getCart = async (userId: string) => {
+  let cart = await Cart.findOne({ user: userId }).populate('items.carId');
 
   if (!cart) {
-    cart = await prisma.cart.create({
-      data: { userId },
-      include: { items: { include: { car: true } } },
-    });
+    cart = new Cart({ user: userId, items: [] });
+    await cart.save();
   }
 
   return cart;
 };
 
-export const addToCart = async (userId: number, carId: number, type: string, quantity: number) => {
-  const cart = await getCart(userId);
+export const addToCart = async (userId: string, carId: string, type: 'Sale' | 'Hire', quantity: number) => {
+  let cart = await Cart.findOne({ user: userId });
 
-  const existingItem = cart.items.find(item => item.carId === carId && item.type === type);
+  if (!cart) {
+    cart = await Cart.create({ user: userId, items: [] });
+  }
+
+  const carObjectId = new mongoose.Types.ObjectId(carId);
+  const existingItem = cart.items.find(item => {
+    const itemCarIdString = item.carId.toString();
+    return itemCarIdString === carObjectId.toString() && item.type === type;
+  });
 
   if (existingItem) {
-    return await prisma.cartItem.update({
-      where: { id: existingItem.id },
-      data: { quantity: existingItem.quantity + quantity },
-    });
+    existingItem.quantity += quantity;
   } else {
-    return await prisma.cartItem.create({
-      data: {
-        cartId: cart.id,
-        carId,
-        type,
-        quantity,
-      },
-    });
+    cart.items.push({ carId: carObjectId, quantity, type } as any);
   }
+
+  await cart.save();
+  return cart.populate('items.carId');
 };
 
-export const removeFromCart = async (itemId: number) => {
-  return await prisma.cartItem.delete({
-    where: { id: itemId },
-  });
+export const removeFromCart = async (userId: string, itemId: string) => {
+  const cart = await getCart(userId);
+  // Ensure we are comparing strings to strings
+  cart.items = cart.items.filter(item => (item as any)._id.toString() !== itemId);
+  await cart.save();
+  return cart;
 };
 
-export const updateCartItem = async (itemId: number, quantity: number) => {
-  return await prisma.cartItem.update({
-    where: { id: itemId },
-    data: { quantity },
-  });
+export const updateCartItem = async (userId: string, itemId: string, quantity: number) => {
+  const cart = await getCart(userId);
+  const item = cart.items.find(item => (item as any)._id.toString() === itemId);
+
+  if (item) {
+    item.quantity = quantity;
+    await cart.save();
+  }
+
+  return cart;
 };

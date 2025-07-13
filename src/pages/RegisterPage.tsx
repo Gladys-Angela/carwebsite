@@ -15,7 +15,7 @@ const RegisterPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/auth/register', { username, email, password });
+      await api.post('/auth/register', { username, email, password, role: 'user' });
       navigate('/login');
     } catch (error) {
       console.error('Registration failed:', error);

@@ -10,10 +10,18 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     res.status(400).json({ message: error.message });
   }
 };
+export const getAllOrders = async (req: AuthRequest, res: Response) => {
+  try {
+    const orders = await orderService.getAllOrders();
+    res.status(200).json(orders);
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
 
 export const getOrderById = async (req: AuthRequest, res: Response) => {
   try {
-    const order = await orderService.getOrderById(parseInt(req.params.id));
+    const order = await orderService.getOrderById(req.params.id);
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }

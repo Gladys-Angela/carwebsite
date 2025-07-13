@@ -15,14 +15,33 @@ const Index = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
 
-  const handleAddToCart = async (carId: number, type: string) => {
-    try {
-      await api.post('/cart', { carId, type, quantity: 1 });
-      alert('Item added to cart!');
-    } catch (error) {
-      console.error('Error adding item to cart:', error);
+  const handleAddToCart = async (carId: string, type: string) => {
+  try {
+    const token = localStorage.getItem('token'); // or wherever you store the JWT
+
+    if (!token) {
+      alert('You must be logged in to add items to the cart.');
+      return;
     }
-  };
+
+    await api.post(
+      '/cart',
+      { carId, type, quantity: 1 },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,  // <-- add token here
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+
+    alert('Item added to cart!');
+  } catch (error: any) {
+    console.error('Error adding item to cart:', error.response?.data || error.message);
+    alert(`Failed to add to cart: ${error.response?.data?.message || 'Unknown error'}`);
+  }
+};
+
 
   const handleSearch = async () => {
     try {
@@ -68,7 +87,7 @@ const Index = () => {
           
           {showFilters && (
             <div className="mt-6 pt-6 border-t">
-              <SearchFilters />
+              <SearchFilters onSearch={handleSearch} />
             </div>
           )}
         </div>
@@ -82,7 +101,7 @@ const Index = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {searchResults.map((car) => (
-              <Card key={car.id} className="group hover:shadow-lg transition-shadow duration-300">
+              <Card key={car._id} className="group hover:shadow-lg transition-shadow duration-300">
                 <CardHeader className="p-0">
                   <div className="relative">
                     <img
@@ -142,11 +161,11 @@ const Index = () => {
                   </div>
                   <div className="flex gap-2">
                     {car.type === 'Sale' ? (
-                      <Button className="flex-1" size="sm" onClick={() => handleAddToCart(car.id, 'Sale')}>
+                      <Button className="flex-1" size="sm" onClick={() => handleAddToCart(car._id, 'Sale')}>
                         Add to Cart
                       </Button>
                     ) : (
-                      <Button className="flex-1" size="sm" onClick={() => handleAddToCart(car.id, 'Hire')}>
+                      <Button className="flex-1" size="sm" onClick={() => handleAddToCart(car._id, 'Hire')}>
                         Hire Now
                       </Button>
                     )}
@@ -155,7 +174,7 @@ const Index = () => {
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Listed by {car.dealer.name}
+                    Listed by {car.dealer?.name}
                   </p>
                 </CardContent>
               </Card>

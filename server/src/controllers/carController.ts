@@ -22,7 +22,7 @@ export const getFeaturedCars = async (req: AuthRequest, res: Response) => {
 
 export const getCarById = async (req: AuthRequest, res: Response) => {
   try {
-    const car = await carService.getCarById(parseInt(req.params.id));
+    const car = await carService.getCarById(req.params.id);
     if (!car) {
       return res.status(404).json({ message: 'Car not found' });
     }
@@ -61,7 +61,7 @@ export const getModels = async (req: AuthRequest, res: Response) => {
 
 export const updateCar = async (req: AuthRequest, res: Response) => {
   try {
-    const car = await carService.updateCar(parseInt(req.params.id), req.body);
+    const car = await carService.updateCar(req.params.id, req.body);
     res.status(200).json(car);
   } catch (error: any) {
     res.status(400).json({ message: error.message });
@@ -70,7 +70,7 @@ export const updateCar = async (req: AuthRequest, res: Response) => {
 
 export const deleteCar = async (req: AuthRequest, res: Response) => {
   try {
-    await carService.deleteCar(parseInt(req.params.id));
+    await carService.deleteCar(req.params.id);
     res.status(204).send();
   } catch (error: any) {
     res.status(400).json({ message: error.message });

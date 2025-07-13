@@ -5,16 +5,35 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Star, MapPin, Calendar, Fuel, Settings, Phone, ShoppingCart } from "lucide-react";
 import api from "@/api";
+import SearchFilters from "@/components/SearchFilters";
+import { Car } from "@/types";
 
 const BuyCarsPage = () => {
-  const [cars, setCars] = useState([]);
+  const [cars, setCars] = useState<Car[]>([]);
 
-  const handleAddToCart = async (carId, type) => {
+  const handleAddToCart = async (carId: string, type: 'Sale' | 'Hire') => {
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('Please log in to add items to cart');
+        return;
+      }
+
       await api.post('/cart', { carId, type, quantity: 1 });
       alert('Item added to cart!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding item to cart:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to add item to cart';
+      alert(errorMessage);
+    }
+  };
+
+  const handleSearch = async (filters: any) => {
+    try {
+      const response = await api.get('/cars', { params: filters });
+      setCars(response.data.cars);
+    } catch (error) {
+      console.error("Error fetching cars:", error);
     }
   };
 
@@ -35,9 +54,12 @@ const BuyCarsPage = () => {
       <Navigation />
       <div className="container mx-auto py-8">
         <h1 className="text-3xl font-bold mb-8">All Cars</h1>
+        <div className="mb-8">
+          <SearchFilters onSearch={handleSearch} />
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {cars.map((car) => (
-            <Card key={car.id} className="group overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300">
+            <Card key={car._id} className="group overflow-hidden rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300">
               <CardHeader className="p-0">
                 <div className="relative">
                   <img
@@ -75,12 +97,12 @@ const BuyCarsPage = () => {
                 </div>
                 <div className="flex gap-2 mt-4">
                   {car.type === 'Sale' ? (
-                    <Button className="flex-1" size="sm" onClick={() => handleAddToCart(car.id, 'Sale')}>
+                    <Button className="flex-1" size="sm" onClick={() => handleAddToCart(car._id, 'Sale')}>
                       <ShoppingCart className="h-4 w-4 mr-2" />
                       Add to Cart
                     </Button>
                   ) : (
-                    <Button className="flex-1" size="sm" onClick={() => handleAddToCart(car.id, 'Hire')}>
+                    <Button className="flex-1" size="sm" onClick={() => handleAddToCart(car._id, 'Hire')}>
                       Hire Now
                     </Button>
                   )}

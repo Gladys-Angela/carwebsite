@@ -12,7 +12,7 @@ export const getAllDealers = async (req: Request, res: Response) => {
 
 export const getDealerById = async (req: Request, res: Response) => {
   try {
-    const dealer = await dealerService.getDealerById(parseInt(req.params.id));
+    const dealer = await dealerService.getDealerById(req.params.id);
     if (!dealer) {
       return res.status(404).json({ message: 'Dealer not found' });
     }

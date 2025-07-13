@@ -8,12 +8,19 @@ const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [token, setToken] = useState(localStorage.getItem('token'));
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const handleStorageChange = () => {
-      setToken(localStorage.getItem('token'));
+      const user = localStorage.getItem('user');
+      if (user) {
+        setUser(JSON.parse(user));
+      } else {
+        setUser(null);
+      }
     };
     window.addEventListener('storage', handleStorageChange);
+    handleStorageChange();
     return () => {
       window.removeEventListener('storage', handleStorageChange);
     };
@@ -21,7 +28,9 @@ const Navigation = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setToken(null);
+    setUser(null);
     navigate('/');
   };
 
@@ -40,6 +49,9 @@ const Navigation = () => {
             <Link to="/" className="text-foreground hover:text-primary transition-colors">Home</Link>
             <Link to="/about" className="text-foreground hover:text-primary transition-colors">About</Link>
             <Link to="/contact" className="text-foreground hover:text-primary transition-colors">Contact</Link>
+            {user && user.role === 'admin' && (
+              <Link to="/admin" className="text-foreground hover:text-primary transition-colors">Admin</Link>
+            )}
           </div>
 
           {/* Desktop Actions */}
@@ -88,6 +100,9 @@ const Navigation = () => {
               <Link to="/" className="block px-3 py-2 text-foreground hover:text-primary">Home</Link>
               <Link to="/about" className="block px-3 py-2 text-foreground hover:text-primary">About</Link>
               <Link to="/contact" className="block px-3 py-2 text-foreground hover:text-primary">Contact</Link>
+              {user && user.role === 'admin' && (
+                <Link to="/admin" className="block px-3 py-2 text-foreground hover:text-primary">Admin</Link>
+              )}
               <div className="flex items-center space-x-2 px-3 py-2">
                 {token ? (
                   <Button onClick={handleLogout} variant="ghost" size="sm">

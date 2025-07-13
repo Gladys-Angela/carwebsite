@@ -8,14 +8,31 @@ import api from "@/api";
 const FeaturedCars = () => {
   const [featuredCars, setFeaturedCars] = useState([]);
 
-  const handleAddToCart = async (carId, type) => {
-    try {
-      await api.post('/cart', { carId, type, quantity: 1 });
-      alert('Item added to cart!');
-    } catch (error) {
-      console.error('Error adding item to cart:', error);
-    }
-  };
+const token = localStorage.getItem('token'); // or wherever you store your JWT
+
+const handleAddToCart = async (carId, type) => {
+  try {
+    console.log("📦 Sending to backend:", { carId, type, quantity: 1 });
+
+    const res = await api.post(
+      '/cart',
+      { carId, type, quantity: 1 },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    alert('✅ Item added to cart!');
+  } catch (error) {
+    console.error('❌ Error adding to cart:', error.response?.data || error.message);
+    alert(`❌ Failed to add to cart: ${error.response?.data?.message || 'Unknown error'}`);
+  }
+};
+
+
 
   useEffect(() => {
     const fetchFeaturedCars = async () => {
@@ -77,12 +94,12 @@ const FeaturedCars = () => {
               </div>
               <div className="flex gap-2 mt-4">
                 {car.type === 'Sale' ? (
-                  <Button className="flex-1" size="sm" onClick={() => handleAddToCart(car.id, 'Sale')}>
+                  <Button className="flex-1" size="sm" onClick={() => handleAddToCart(car._id, 'Sale')}>
                     <ShoppingCart className="h-4 w-4 mr-2" />
                     Add to Cart
                   </Button>
                 ) : (
-                  <Button className="flex-1" size="sm" onClick={() => handleAddToCart(car.id, 'Hire')}>
+                  <Button className="flex-1" size="sm" onClick={() => handleAddToCart(car._id, 'Hire')}>
                     Hire Now
                   </Button>
                 )}

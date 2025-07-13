@@ -55,7 +55,7 @@ const CartPage = () => {
   }
 
   const subtotal = cart.items.reduce((acc, item) => {
-    const price = item.type === 'Sale' ? item.car.price : item.car.hireRate;
+    const price = item.type === 'Sale' ? item.carId.price : item.carId.hireRate;
     return acc + price * item.quantity;
   }, 0);
 
@@ -72,22 +72,22 @@ const CartPage = () => {
               <Card>
                 <CardContent className="p-6">
                   {cart.items.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between py-4">
+                    <div key={item._id} className="flex items-center justify-between py-4">
                       <div className="flex items-center gap-4">
-                        <img src={item.car.image} alt={item.car.model} className="w-24 h-24 object-cover rounded-lg" />
+                        <img src={item.carId.image} alt={item.carId.carModel} className="w-24 h-24 object-cover rounded-lg" />
                         <div>
-                          <h2 className="font-semibold">{item.car.make} {item.car.model}</h2>
+                          <h2 className="font-semibold">{item.carId.make} {item.carId.carModel}</h2>
                           <p className="text-muted-foreground">{item.type}</p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold">${item.type === 'Sale' ? item.car.price.toLocaleString() : item.car.hireRate.toLocaleString()}</p>
+                        <p className="font-semibold">${item.type === 'Sale' ? item.carId.price.toLocaleString() : item.carId.hireRate.toLocaleString()}</p>
                         <div className="flex items-center gap-2 mt-2">
-                          <Button variant="outline" size="sm" onClick={() => handleUpdateQuantity(item.id, item.quantity - 1)}>-</Button>
+                          <Button variant="outline" size="sm" onClick={() => handleUpdateQuantity(item._id, item.quantity - 1)}>-</Button>
                           <span>{item.quantity}</span>
-                          <Button variant="outline" size="sm" onClick={() => handleUpdateQuantity(item.id, item.quantity + 1)}>+</Button>
+                          <Button variant="outline" size="sm" onClick={() => handleUpdateQuantity(item._id, item.quantity + 1)}>+</Button>
                         </div>
-                        <Button variant="link" size="sm" onClick={() => handleRemove(item.id)}>Remove</Button>
+                        <Button variant="link" size="sm" onClick={() => handleRemove(item._id)}>Remove</Button>
                       </div>
                     </div>
                   ))}

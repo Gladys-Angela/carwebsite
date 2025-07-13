@@ -36,8 +36,8 @@ const OrderConfirmationPage = () => {
       <div className="container mx-auto py-8">
         <h1 className="text-3xl font-bold mb-8">Order Confirmation</h1>
         <p>Thank you for your order!</p>
-        <p><strong>Order ID:</strong> {order.id}</p>
-        <p><strong>Total:</strong> ${order.totalAmount.toLocaleString()}</p>
+        <p><strong>Order ID:</strong> {order._id}</p>
+        <p><strong>Total:</strong> ${order.totalPrice.toLocaleString()}</p>
         <p><strong>Status:</strong> {order.status}</p>
       </div>
     </div>

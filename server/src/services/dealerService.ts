@@ -1,18 +1,15 @@
-import prisma from '../config/db';
+import Dealer from '../models/dealer.model';
 
 export const getAllDealers = async () => {
-  return await prisma.dealer.findMany();
+  return await Dealer.find();
 };
 
-export const getDealerById = async (id: number) => {
-  return await prisma.dealer.findUnique({
-    where: { id },
-    include: { cars: true },
-  });
+export const getDealerById = async (id: string) => {
+  return await Dealer.findById(id).populate('cars');
 };
 
 export const createDealer = async (data: any) => {
-  return await prisma.dealer.create({
-    data,
-  });
+  const dealer = new Dealer(data);
+  await dealer.save();
+  return dealer;
 };

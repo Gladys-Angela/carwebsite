@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
 export interface AuthRequest extends Request {
-  user?: { id: number; role: string };
+  user?: { id: string; role: string };
 }
 
 export const protect = (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -13,8 +13,8 @@ export const protect = (req: AuthRequest, res: Response, next: NextFunction) => 
     return res.status(401).json({ message: 'Not authorized, no token' });
   }
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; role: string };
-    req.user = decoded;
+    const decoded = jwt.verify(token, JWT_SECRET) as { user: { _id: string; role: string } };
+    req.user = { id: decoded.user._id, role: decoded.user.role };
     next();
   } catch (error) {
     res.status(401).json({ message: 'Not authorized, token failed' });

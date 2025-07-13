@@ -1,90 +1,78 @@
-import prisma from '../config/db';
+import Car from '../models/car.model';
 
 export const getAllCars = async (filters: any) => {
   const { make, model, year_from, year_to, price_min, price_max, condition, transmission, fuelType, search, sort_by, page = 1, limit = 10 } = filters;
-  const where: any = {};
+  const query: any = {};
 
-  if (make) where.make = make;
-  if (model) where.model = model;
-  if (year_from) where.year = { ...where.year, gte: parseInt(year_from) };
-  if (year_to) where.year = { ...where.year, lte: parseInt(year_to) };
-  if (price_min) where.price = { ...where.price, gte: parseFloat(price_min) };
-  if (price_max) where.price = { ...where.price, lte: parseFloat(price_max) };
-  if (condition) where.condition = condition;
-  if (transmission) where.transmission = transmission;
-  if (fuelType) where.fuelType = fuelType;
+  if (make) query.make = make;
+  if (model) query.model = model;
+  if (year_from) query.year = { ...query.year, $gte: parseInt(year_from) };
+  if (year_to) query.year = { ...query.year, $lte: parseInt(year_to) };
+  if (price_min) query.price = { ...query.price, $gte: parseFloat(price_min) };
+  if (price_max) query.price = { ...query.price, $lte: parseFloat(price_max) };
+  if (condition) query.condition = condition;
+  if (transmission) query.transmission = transmission;
+  if (fuelType) query.fuelType = fuelType;
   if (search) {
-    where.OR = [
-      { make: { contains: search, mode: 'insensitive' } },
-      { model: { contains: search, mode: 'insensitive' } },
+    query.$or = [
+      { make: { $regex: search, $options: 'i' } },
+      { model: { $regex: search, $options: 'i' } },
     ];
   }
 
-  const orderBy = sort_by ? { [sort_by.split('_')[0]]: sort_by.split('_')[1] } : {};
+  const sort: any = {};
+  if (sort_by) {
+    const [field, order] = sort_by.split('_');
+    sort[field] = order === 'asc' ? 1 : -1;
+  }
 
-  const cars = await prisma.car.findMany({
-    where,
-    orderBy,
-    skip: (page - 1) * limit,
-    take: parseInt(limit),
-    include: { dealer: true },
-  });
+  const cars = await Car.find(query)
+    .sort(sort)
+    .skip((page - 1) * limit)
+    .limit(parseInt(limit))
+    .populate('dealer');
 
-  const total = await prisma.car.count({ where });
+  const total = await Car.countDocuments(query);
   return { cars, total, page, limit };
 };
 
 export const getFeaturedCars = async () => {
-  return await prisma.car.findMany({
-    where: { averageRating: { gte: 4.5 } },
-    take: 4,
-    include: { dealer: true },
-  });
+  return await Car.find({ averageRating: { $gte: 4.5 } })
+    .limit(4)
+    .populate('dealer');
 };
 
-export const getCarById = async (id: number) => {
-  return await prisma.car.findUnique({
-    where: { id },
-    include: { dealer: true, reviews: { include: { user: true } } },
-  });
-};
-
-export const createCar = async (data: any, userId: number) => {
-  const { dealerId, ...carData } = data;
-  return await prisma.car.create({
-    data: {
-      ...carData,
-      dealer: { connect: { id: dealerId } },
-      createdBy: { connect: { id: userId } },
+export const getCarById = async (id: string) => {
+  return await Car.findById(id).populate('dealer').populate({
+    path: 'reviews',
+    populate: {
+      path: 'user',
+      model: 'User',
     },
   });
 };
 
-export const getMakes = async () => {
-  const makes = await prisma.car.findMany({
-    distinct: ['make'],
-    select: { make: true },
+export const createCar = async (data: any, userId: string) => {
+  const car = new Car({
+    ...data,
+    createdBy: userId,
   });
-  return makes.map(car => car.make);
+  await car.save();
+  return car;
+};
+
+export const getMakes = async () => {
+  return await Car.distinct('make');
 };
 
 export const getModels = async () => {
-  const models = await prisma.car.findMany({
-    distinct: ['model'],
-    select: { model: true },
-  });
-  return models.map(car => car.model);
+  return await Car.distinct('model');
 };
 
-export const updateCar = async (id: number, data: any) => {
-  return await prisma.car.update({
-    where: { id },
-    data,
-  });
+export const updateCar = async (id: string, data: any) => {
+  return await Car.findByIdAndUpdate(id, data, { new: true });
 };
 
-export const deleteCar = async (id: number) => {
-  return await prisma.car.delete({
-    where: { id },
-  });
+export const deleteCar = async (id: string) => {
+  return await Car.findByIdAndDelete(id);
 };
