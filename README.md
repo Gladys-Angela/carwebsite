@@ -16,8 +16,7 @@ This is the engine of your application. It handles business logic, interacts wit
  Node.js - A JavaScript runtime environment for building server-side applications. 
 Express.js - A minimal and flexible web framework for Node.js, used to build the API. 
 TypeScript - For consistency with the frontend and for writing type-safe backend code. 
-Prisma - A modern database toolkit (ORM) that makes it easy to interact with the database. 
-SQLite - A simple, file-based database used for local development. 
+MongoDb - a popular NoSQL database used for storing structured, semistructured, and unstructured data
 JSON Web Tokens (JWT) - For creating secure authentication tokens for user sessions. 
 
 ## Frontend Deployment
