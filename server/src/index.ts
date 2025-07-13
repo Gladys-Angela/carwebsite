@@ -49,7 +49,7 @@ app.use('/api/admin', adminRoutes);
 
 // Test route
 app.get('/', (req: Request, res: Response) => {
-  res.send('API is running...');
+  res.send('API is running... Updated for Vercel CORS');
 });
 
 io.on('connection', (socket) => {
