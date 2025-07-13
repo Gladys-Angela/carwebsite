@@ -6,6 +6,21 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret';
 
 export const register = async (data: any): Promise<IUser> => {
   const { username, email, password, role } = data;
+  
+  // Check if user already exists
+  const existingUser = await User.findOne({ 
+    $or: [{ email }, { username }] 
+  });
+  
+  if (existingUser) {
+    if (existingUser.email === email) {
+      throw new Error('Email already exists');
+    }
+    if (existingUser.username === username) {
+      throw new Error('Username already exists');
+    }
+  }
+  
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = new User({
     username,
@@ -41,4 +56,29 @@ export const login = async (data: any): Promise<{ user: { _id: any; username: st
   });
 
   return { user: userPayload, token };
+};
+
+export const createAdmin = async (): Promise<void> => {
+  // Check if admin already exists
+  const existingAdmin = await User.findOne({ email: 'admin@example.com' });
+  if (existingAdmin) {
+    throw new Error('Admin user already exists');
+  }
+
+  const hashedPassword = await bcrypt.hash('password123', 10);
+  const adminUser = new User({
+    username: 'admin',
+    email: 'admin@example.com',
+    password_hash: hashedPassword,
+    role: 'admin',
+  });
+  
+  await adminUser.save();
+};
+
+export const deleteAdmin = async (): Promise<void> => {
+  const result = await User.deleteOne({ email: 'admin@example.com' });
+  if (result.deletedCount === 0) {
+    throw new Error('Admin user not found');
+  }
 };

@@ -15,7 +15,8 @@ const DealerSchema = new mongoose.Schema({
 const UserSchema = new mongoose.Schema({
     username: String,
     email: String,
-    password: String, // Will be hashed
+    password_hash: String, // Will be hashed
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
 });
 
 const CarSchema = new mongoose.Schema({
@@ -66,13 +67,14 @@ async function seedDatabase() {
     const user1 = await User.create({
         username: "testuser",
         email: "test@example.com",
-        password: hashedPassword,
+        password_hash: hashedPassword,
+        role: "user",
     });
 
     const adminUser = await User.create({
         username: "admin",
         email: "admin@example.com",
-        password: hashedPassword,
+        password_hash: hashedPassword,
         role: "admin",
     });
 
