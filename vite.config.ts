@@ -8,11 +8,11 @@ export default defineConfig(({ mode }) => ({
 server: {
 host: "::",
 port: 8080,
-proxy: {
+    proxy: {
     "/api": {
-        target: "http://localhost:5000", // Your backend server
+        target: "https://carwebsite-1-fnsd.onrender.com", // Your deployed backend server
         changeOrigin: true,
-        secure: false,
+        secure: true,
       },
     },
 },

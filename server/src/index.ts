@@ -21,7 +21,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:8080",
+    origin: ["http://localhost:8080", "https://carwebsite-git-main-gladysangelas-projects.vercel.app"],
     methods: ["GET", "POST"]
   }
 });
@@ -33,7 +33,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: "http://localhost:8080",  // Your frontend URL
+  origin: ["http://localhost:8080", "https://carwebsite-git-main-gladysangelas-projects.vercel.app"],  // Your frontend URLs
   credentials: true
 }));
 app.use(express.json());
